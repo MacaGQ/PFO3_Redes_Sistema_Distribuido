@@ -19,25 +19,25 @@ def send_request(action, data):
 
 # Registrarse
 def register():
-    print("--- REGISTRO ---")
+    print("\n--- REGISTRO ---\n")
     username = input("Ingrese un nombre de usuario: ")
     password = input("Ingrese una contraseña: ")
 
     data = {"username": username, "password": password}
     
-    print(f"Registrando usuario {username}...")
+    print(f"\nRegistrando usuario {username}...\n")
 
     response = json.loads(send_request("register", data))
 
     match response.get("status"):
         case "success":
-            print("Usuario creado con exito! Volviendo al menu principal...")
+            print("\nUsuario creado con exito! Volviendo al menu principal...\n")
 
         case "in_use":
-            print("ERROR: Usuario ya en uso. Intente con otro usuario o inicie sesión")
+            print("\nERROR: Usuario ya en uso. Intente con otro usuario o inicie sesión\n")
 
         case "exception":
-            print("Error del servidor")
+            print("\nError del servidor\n")
 
     main()
 
@@ -70,7 +70,7 @@ def login():
 
 # Manejar tareas
 def tasks(username):
-    print("--- TAREAS ---")
+    print("\n--- TAREAS ---\n")
     print("Ingrese una opción")
     print("[1] Ver tareas")
     print("[2] Crear tarea nueva")
@@ -95,7 +95,7 @@ def tasks(username):
 
 # Menu Principal
 def main():
-    print("Bienvenido a la App. Ingrese una opcion para continuar")
+    print("\nBienvenido a la App. Ingrese una opcion para continuar")
     print("[1] Registrarse")
     print("[2] Iniciar Sesion")
     print("[3] Salir")
@@ -111,7 +111,8 @@ def main():
                 login()           
 
             case "3":
-                exit
+                print("Saliendo...")
+                exit()
 
             case _:
                 print("Error. Ingrese solo el número de la opcion deseada")
