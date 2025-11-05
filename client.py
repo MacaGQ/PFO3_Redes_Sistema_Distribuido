@@ -36,9 +36,6 @@ def register():
         case "in_use":
             print("\nERROR: Usuario ya en uso. Intente con otro usuario o inicie sesión\n")
 
-        case "exception":
-            print("\nError del servidor\n")
-
     main()
 
 # Iniciar Sesion

@@ -68,7 +68,6 @@ def handle_client(connection):
 
     except Exception as e:
         print(f"Error en handle_client: {e}")
-        return {"status": "exception"}
 
 
 def register(message):
