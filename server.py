@@ -3,12 +3,19 @@ import threading
 import json
 import bcrypt
 import pika
+import os
+from dotenv import load_dotenv
 from database import create_tables, get_user, create_user, get_tasks_user, create_task
 
+load_dotenv()
+
 # Informacion
-HOST = 'localhost'
+HOST = os.getenv("POSTGRES_HOST")
 PORT = 5000
-ddbb = 'tasks_db'
+QUEUE = os.getenv("RABBITMQ_QUEUE")
+RABBIT_PORT = int(os.getenv("RABBITMQ_PORT"))
+RABBIT_USER = os.getenv("RABBITMQ_USER")
+RABBIT_PASS = os.getenv("RABBITMQ_PASSWORD")
 
 
 def init_socket():
@@ -25,14 +32,14 @@ def init_socket():
 
     return server_socket
 
-def conn_accept(socket):
+def conn_accept(socket, channel):
     print("Iniciando conexion...")
     try:
         while True:
             connection, address = socket.accept()
             print(f"Conexion establecida con {address}")
 
-            thread = threading.Thread(target=handle_client, args=(connection,))
+            thread = threading.Thread(target=handle_client, args=(connection, channel))
             thread.start()
 
     except Exception as e:
@@ -43,7 +50,7 @@ def conn_accept(socket):
         socket.close()
 
 
-def handle_client(connection):
+def handle_client(connection, channel):
     try:
         with connection:
             while True:
@@ -66,6 +73,7 @@ def handle_client(connection):
                         response = get_tasks(message)
 
                     case "new_task":
+                        message["channel"] = channel
                         response = new_task(message)
 
                 connection.send(json.dumps(response).encode())
@@ -127,12 +135,15 @@ def get_tasks(message):
 def new_task(message):
     username = message.get("username")
     task = message.get("task")
+    channel = message.get("channel")
 
-    created_task = create_task(username, task)
-    print(created_task)
+    task_id = create_task(username, task)
+    print(task_id)
 
-    if created_task:
+    if task_id:
         response = {"status": "task_created"}
+        data = {"task_id": task_id, "task": task}
+        send_to_worker(data, channel)
     else:
         response = {"status": "error"}
 
@@ -140,12 +151,31 @@ def new_task(message):
 
     return response
     
-    
+def send_to_worker(task, channel):
+    body = json.dumps(task)
+    channel.basic_publish(exchange='', routing_key='tasks', body=body)
+    print("Tarea enviada a [Worker]")
+
+def start_queue():
+    credentials = pika.PlainCredentials(RABBIT_USER, RABBIT_PASS)
+    parameters = pika.ConnectionParameters(
+        host = HOST,
+        port= RABBIT_PORT,
+        credentials=credentials
+    )
+
+    connection = pika.BlockingConnection(parameters)
+    channel = connection.channel()
+
+    channel.queue_declare(queue=QUEUE)
+
+    return channel
 
 def start_server():
     try:
+        channel = start_queue()
         socket = init_socket()
-        conn_accept(socket)
+        conn_accept(socket, channel)
     
     except Exception as e:
         print(f"Error al iniciar servidor: {e}")

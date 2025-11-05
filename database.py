@@ -145,6 +145,7 @@ def update_task_status(task_id, status):
         update_status_query = '''UPDATE tasks SET status = %s WHERE ID = %s'''
         
         cursor.execute(update_status_query, (status, task_id))
+        connection.commit()
 
         print(f"Estado de la tarea {task_id} actualizado a {status}")
 
