@@ -1,22 +1,18 @@
 import psycopg2
+import os
+from dotenv import load_dotenv
 
-# Data
-DB_USER = "testuser"
-DB_PASSWORD = "testpass"
-
-DB_HOST = 'localhost'
-DB_PORT = '5432'
-DB_NAME = 'tasks_db'
+load_dotenv()
 
 # Obtener conexion con postgres para crear/manipular la base de datos
 def get_connection():
     print("Conectando con la base de datos...")
     try:
-        connection = psycopg2.connect(user = DB_USER,
-                                      password = DB_PASSWORD,
-                                      host = DB_HOST,
-                                      port = DB_PORT,
-                                      database = DB_NAME
+        connection = psycopg2.connect(user = os.getenv("POSTGRES_USER"),
+                                      password = os.getenv("POSTGRES_PASSWORD"),
+                                      host = os.getenv("POSTGRES_HOST"),
+                                      port = os.getenv("POSTGRES_PORT"),
+                                      database = os.getenv("POSTGRES_DB")
                                       )
         print("Conectado a la base de datos")
         return connection
