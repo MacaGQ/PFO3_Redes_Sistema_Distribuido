@@ -119,6 +119,10 @@ def create_task(username, task):
 
         task_id = cursor.fetchone()[0]
 
+        connection.commit()
+
+        print(task_id)
+
         print(f"Tarea {task} creada con exito para el usuario {username}")
         return task_id
         
@@ -167,11 +171,8 @@ def get_tasks_user(username):
 
         cursor.execute(get_tasks_query, (username,))
         tasks = cursor.fetchall()
-        
-        for row in tasks:
-            print("ID: ", row[0])
-            print("Tarea: ", row[2])
-            print("Estado: ", row[3], "\n")
+
+        return tasks      
 
     except Exception as e:
         print(f"Error al obtener tareas de {username}: {e}")

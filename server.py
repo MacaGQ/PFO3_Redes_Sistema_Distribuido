@@ -3,7 +3,7 @@ import threading
 import json
 import bcrypt
 import pika
-from database import create_tables, get_user, create_user
+from database import create_tables, get_user, create_user, get_tasks_user, create_task
 
 # Informacion
 HOST = 'localhost'
@@ -62,6 +62,12 @@ def handle_client(connection):
                     case "login":
                         response = login(message)
 
+                    case "get_tasks":
+                        response = get_tasks(message)
+
+                    case "new_task":
+                        response = new_task(message)
+
                 # AGREGAR MAS FUNCIONES
 
                 connection.send(json.dumps(response).encode())
@@ -103,6 +109,30 @@ def login(message):
         return {"status": "logged_in"}
     else:
         return {"status": "wrong_credentials"}
+    
+def get_tasks(message):
+    username = message.get("username")
+
+    tasks = get_tasks_user(username)
+
+    return tasks
+
+def new_task(message):
+    username = message.get("username")
+    task = message.get("task")
+
+    created_task = create_task(username, task)
+    print(created_task)
+
+    if created_task:
+        response = {"status": "task_created"}
+    else:
+        response = {"status": "error"}
+
+    print(response)
+
+    return response
+    
     
 
 def start_server():

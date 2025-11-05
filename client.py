@@ -77,11 +77,10 @@ def tasks(username):
         option = input("Ingrese solo el numero de opcion deseada: ")
         match option:
             case "1":
-                send_request("get_tasks", username)
-                break
+                get_tasks(username)
         
             case "2":
-                send_request("new_task", username)           
+                new_task(username)     
 
             case "3":
                 main()
@@ -89,6 +88,33 @@ def tasks(username):
             case _:
                 print("Error. Ingrese solo el número de la opcion deseada")
          
+
+def get_tasks(username):
+    data = {"username": username}
+    tasks = send_request("get_tasks", data)
+
+    print(tasks)
+
+    if tasks is not None:
+        for row in tasks:
+            print("ID: ", row[0])
+            print("Tarea: ", row[2])
+            print("Estado: ", row[3], "\n")
+    else:
+        print(f"{username} no tiene tareas asignadas")
+
+
+def new_task(username):
+    task = input("Ingrese el nombre de la tarea: ")
+
+    data = {"username": username, "task": task}
+
+    response = json.loads(send_request("new_task", data))
+
+    if response.get("status") == "task_created":
+        print(f"Tarea '{task}' creada correctamente!")
+    elif response.get("status") == "error":
+        print(f"Error al crear la tarea '{task}'")
 
 # Menu Principal
 def main():
