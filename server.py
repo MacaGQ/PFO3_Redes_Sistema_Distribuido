@@ -21,7 +21,7 @@ def init_socket():
     print("Socket listen")
     server_socket.listen(5)
 
-    print("Servidor escuchando en {HOST}:{PORT}")
+    print(f"Servidor escuchando en {HOST}:{PORT}")
 
     return server_socket
 
