@@ -68,8 +68,6 @@ def handle_client(connection):
                     case "new_task":
                         response = new_task(message)
 
-                # AGREGAR MAS FUNCIONES
-
                 connection.send(json.dumps(response).encode())
 
     except Exception as e:
@@ -115,7 +113,16 @@ def get_tasks(message):
 
     tasks = get_tasks_user(username)
 
-    return tasks
+    if tasks:
+        print("Enviando tareas a cliente")
+        print(tasks)
+        response = {"status": "success", "tasks": tasks}
+    else:
+        print("No hay tareas")
+        print(tasks)
+        response = {"status": "no_tasks"}
+
+    return response
 
 def new_task(message):
     username = message.get("username")

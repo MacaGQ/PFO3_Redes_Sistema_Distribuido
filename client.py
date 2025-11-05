@@ -91,30 +91,44 @@ def tasks(username):
 
 def get_tasks(username):
     data = {"username": username}
-    tasks = send_request("get_tasks", data)
+    response = json.loads(send_request("get_tasks", data))
 
-    print(tasks)
+    # if tasks is not None:
+    #     for row in tasks:
+    #         print("ID: ", row[0])
+    #         print("Tarea: ", row[2])
+    #         print("Estado: ", row[3], "\n")
+    # else:
+    #     print(f"{username} no tiene tareas asignadas")
 
-    if tasks is not None:
-        for row in tasks:
+    if response.get("status") == "success":
+        user_tasks = response.get("tasks")
+        for row in user_tasks:
+            print("\n")
             print("ID: ", row[0])
             print("Tarea: ", row[2])
-            print("Estado: ", row[3], "\n")
-    else:
-        print(f"{username} no tiene tareas asignadas")
+            print("Estado: ", row[3])
 
+    else:
+        print(f"\n{username} no tiene tareas asignadas\n")
+
+    print("\nVolviendo al menu anterior...")
+    tasks(username)
 
 def new_task(username):
-    task = input("Ingrese el nombre de la tarea: ")
+    task = input("\nIngrese el nombre de la tarea: ")
 
     data = {"username": username, "task": task}
 
     response = json.loads(send_request("new_task", data))
 
     if response.get("status") == "task_created":
-        print(f"Tarea '{task}' creada correctamente!")
+        print(f"\nTarea '{task}' creada correctamente!\n")
     elif response.get("status") == "error":
-        print(f"Error al crear la tarea '{task}'")
+        print(f"\nError al crear la tarea '{task}'\n")
+
+    print('\nVolviendo al menu anterior...')
+    tasks(username)
 
 # Menu Principal
 def main():

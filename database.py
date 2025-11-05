@@ -169,7 +169,7 @@ def get_tasks_user(username):
 
         get_tasks_query = '''SELECT * FROM tasks WHERE user_id = %s'''
 
-        cursor.execute(get_tasks_query, (username,))
+        cursor.execute(get_tasks_query, (user_id,))
         tasks = cursor.fetchall()
 
         return tasks      
