@@ -8,6 +8,7 @@ from database import update_task_status
 
 load_dotenv()
 
+# Información
 HOST = os.getenv("RABBITMQ_HOST")
 QUEUE = os.getenv("RABBITMQ_QUEUE")
 RABBIT_PORT = int(os.getenv("RABBITMQ_PORT"))

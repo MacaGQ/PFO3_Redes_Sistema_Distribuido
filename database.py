@@ -4,15 +4,22 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Información
+USER = os.getenv("POSTGRES_USER")
+PASSWORD = os.getenv("POSTGRES_PASSWORD")
+HOST = os.getenv("POSTGRES_HOST")
+PORT = os.getenv("POSTGRES_PORT")
+DB = os.getenv("POSTGRES_DB")
+
 # Obtener conexion con postgres para manipular la base de datos
 def get_connection():
     print("Conectando con la base de datos...")
     try:
-        connection = psycopg2.connect(user = os.getenv("POSTGRES_USER"),
-                                      password = os.getenv("POSTGRES_PASSWORD"),
-                                      host = os.getenv("POSTGRES_HOST"),
-                                      port = os.getenv("POSTGRES_PORT"),
-                                      database = os.getenv("POSTGRES_DB")
+        connection = psycopg2.connect(user = USER,
+                                      password = PASSWORD,
+                                      host = HOST,
+                                      port = PORT,
+                                      database = DB 
                                       )
         print("Conectado a la base de datos")
         return connection
