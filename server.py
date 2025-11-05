@@ -1,0 +1,99 @@
+import socket
+import threading
+import json
+import bcrypt
+import pika
+from database import create_tables, get_user, create_user
+
+# Informacion
+HOST = 'localhost'
+PORT = 5000
+ddbb = 'tasks_db'
+
+
+def init_socket():
+    print("Creando socket del servidor")
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+    # Configuracion con HOST y PUERTO
+    print("Socket bind")
+    server_socket.bind((HOST, PORT))
+    print("Socket listen")
+    server_socket.listen(5)
+
+    print("Servidor escuchando en {HOST}:{PORT}")
+
+    return server_socket
+
+def conn_accept(socket):
+    print("Iniciando conexion...")
+    try:
+        while True:
+            connection, address = socket.accept()
+            print(f"Conexion establecida con {address}")
+
+            thread = threading.Thread(target=handle_client, args=(connection,))
+            thread.start()
+
+    except Exception as e:
+        print(f"Error en conn_accept: {e}")
+
+    finally:
+        print("Cerrando socket")
+        socket.close()
+
+
+def handle_client(connection):
+    try:
+        with connection:
+            while True:
+                data = connection.recv(1024).decode()
+                
+                if not data:
+                    break
+
+                message = json.loads(data)
+                action = message.get("action")
+
+                match action:
+                    case "register":
+                        register(message) # CHEQUEAR SI ESTO ESTA BIEN
+
+                # HACER ALGO CON LA DATA
+
+    except Exception as e:
+        print(f"Error en handle_client: {e}")
+
+
+def register(message): # COMPLETAR ACA Y AGREGAR MÁS FUNCIONES
+    username = message.get("username")
+
+    exists = get_user(username)
+
+    if exists != None:
+        print("Usuario ya en uso! Intentelo nuevamente")
+       
+    else:
+        password = message.get("password")
+
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+        create_user(username, hashed_password)
+
+
+
+def start_server():
+    try:
+        socket = init_socket()
+        conn_accept(socket)
+    
+    except Exception as e:
+        print(f"Error al iniciar servidor: {e}")
+
+
+if __name__ == "__main__":
+    create_tables()
+    start_server()
+
+
+    
