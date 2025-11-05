@@ -57,21 +57,25 @@ def handle_client(connection):
 
                 match action:
                     case "register":
-                        register(message) # CHEQUEAR SI ESTO ESTA BIEN
+                        response = register(message)
 
-                # HACER ALGO CON LA DATA
+                # AGREGAR MAS FUNCIONES
+
+                connection.send(json.dumps(response).encode())
 
     except Exception as e:
         print(f"Error en handle_client: {e}")
+        return {"status": "exception"}
 
 
-def register(message): # COMPLETAR ACA Y AGREGAR MÁS FUNCIONES
+def register(message):
     username = message.get("username")
 
     exists = get_user(username)
 
     if exists != None:
-        print("Usuario ya en uso! Intentelo nuevamente")
+        print("Usuario en uso")
+        return {"status": "in_use"}
        
     else:
         password = message.get("password")
@@ -79,6 +83,8 @@ def register(message): # COMPLETAR ACA Y AGREGAR MÁS FUNCIONES
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
         create_user(username, hashed_password)
+
+        return {"status":"success"}
 
 
 

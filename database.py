@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Obtener conexion con postgres para crear/manipular la base de datos
+# Obtener conexion con postgres para manipular la base de datos
 def get_connection():
     print("Conectando con la base de datos...")
     try:

@@ -27,9 +27,17 @@ def register():
     
     print(f"Registrando usuario {username}...")
 
-    response = send_request("register", data)
+    response = json.loads(send_request("register", data))
 
-    # De acuerdo a response comunicar si se registro no
+    match response.get("status"):
+        case "success":
+            print("Usuario creado con exito! Volviendo al menu principal...")
+
+        case "in_use":
+            print("ERROR: Usuario ya en uso. Intente con otro usuario o inicie sesión")
+
+        case "exception":
+            print("Error del servidor")
 
     main()
 
