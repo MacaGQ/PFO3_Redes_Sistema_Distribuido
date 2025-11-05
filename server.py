@@ -59,6 +59,9 @@ def handle_client(connection):
                     case "register":
                         response = register(message)
 
+                    case "login":
+                        response = login(message)
+
                 # AGREGAR MAS FUNCIONES
 
                 connection.send(json.dumps(response).encode())
@@ -79,14 +82,29 @@ def register(message):
        
     else:
         password = message.get("password")
-
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
         create_user(username, hashed_password)
 
         return {"status":"success"}
 
+def login(message):
+    username = message.get("username")
 
+    user = get_user(username)
+
+    if not user:
+        print("No existe el usuario")
+        return {"status": "no_user"}
+
+    password = message.get("password")
+    hashed_password = user[2]
+
+    if bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8')):
+        return {"status": "logged_in"}
+    else:
+        return {"status": "wrong_credentials"}
+    
 
 def start_server():
     try:

@@ -43,23 +43,30 @@ def register():
 
 # Iniciar Sesion
 def login():
-    print("--- INICIAR SESION ---")
+    print("\n--- INICIAR SESION ---\n")
     username = input("Ingrese su nombre de usuario: ")
     password = input("Ingrese su contraseña: ")
 
     data = {"username": username, "password": password}
 
-    print(f"Iniciando Sesión para {username}...")
+    print(f"\nIniciando Sesión para {username}...\n")
 
-    response = send_request("login", data)
+    response = json.loads(send_request("login", data))
 
     # De acuerdo a response habilitar inicio de sesion o no
+    match response.get("status"):
+        case "logged_in":
+            print(f"\nBienvenido {username}!\n")
+            tasks(username)
 
-    if True:
-        tasks()
-    else:
-        print("Credenciales incorrectas. Volviendo al menu principal")
-        main()
+        case "no_user":
+            print(f"\nNo existe un usuario '{username}' registrado. Por favor registrarse\n")
+            main()
+
+        case "wrong_credentials":
+            print("\nCredenciales incorrectas. Volviendo al menu principal\n")
+            main()
+
 
 # Manejar tareas
 def tasks(username):
